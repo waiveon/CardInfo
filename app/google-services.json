@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "705171733628",
+    "firebase_url": "https://cardinfo-6e700.firebaseio.com",
+    "project_id": "cardinfo-6e700",
+    "storage_bucket": "cardinfo-6e700.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:705171733628:android:874cf2c01f95ddce721df9",
+        "android_client_info": {
+          "package_name": "com.sweetsound.cardinfo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "705171733628-hto0gm581e46fe65tqjflqg2kl0oceuv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgDl1_ipzOEbZQ2qN5h96X3IicZtlK4zY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "705171733628-hto0gm581e46fe65tqjflqg2kl0oceuv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

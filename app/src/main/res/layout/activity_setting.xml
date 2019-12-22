@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp"
+    tools:context=".ui.SettingActivity">
+
+    <CheckBox
+        android:id="@+id/manual_input_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/manual_input"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <Spinner
+        android:id="@+id/card_name_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/round_background"
+        app:layout_constraintTop_toBottomOf="@id/manual_input_checkbox"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/added_price_textview"/>
+
+    <TextView
+        android:id="@+id/added_price_textview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"
+        android:gravity="right"
+        android:textColor="#FFEB0000"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/added_price_info_textview"
+        app:layout_constraintTop_toBottomOf="@id/card_name_spinner"/>
+
+    <TextView
+        android:id="@+id/added_price_info_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"
+        android:text="@string/manual_input_price"
+        app:layout_constraintLeft_toRightOf="@id/added_price_textview"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/card_name_spinner"/>
+
+    <TextView
+        android:id="@+id/add_price_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/add_price"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/add_price_exittext"
+        app:layout_constraintTop_toBottomOf="@id/added_price_textview"
+        app:layout_constraintBottom_toBottomOf="@id/add_price_exittext"
+        />
+
+    <EditText
+        android:id="@+id/add_price_exittext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="right"
+        android:inputType="numberDecimal"
+        app:layout_constraintTop_toBottomOf="@id/added_price_textview"
+        app:layout_constraintRight_toLeftOf="@id/won_textview"
+        app:layout_constraintLeft_toRightOf="@id/add_price_textview"/>
+
+    <TextView
+        android:id="@+id/won_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="5dp"
+        android:text="@string/won"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        app:layout_constraintBottom_toBottomOf="@id/add_price_exittext"
+        app:layout_constraintTop_toBottomOf="@id/added_price_textview"
+        app:layout_constraintLeft_toRightOf="@id/add_price_exittext"
+        app:layout_constraintRight_toLeftOf="@id/apply_button"/>
+
+    <EditText
+        android:id="@+id/card_num_exittext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="5dp"
+        android:gravity="right"
+        android:hint="@string/card_number"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/add_price_exittext"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/card_num_ellipsis_textview"/>
+
+    <TextView
+        android:id="@+id/card_num_ellipsis_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
+        android:text="@string/card_number_ellipsis"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        app:layout_constraintLeft_toRightOf="@id/card_num_exittext"
+        app:layout_constraintRight_toLeftOf="@id/apply_button"
+        app:layout_constraintTop_toBottomOf="@id/add_price_exittext"
+        app:layout_constraintBottom_toBottomOf="@id/card_num_exittext"
+        />
+
+    <Button
+        android:id="@+id/apply_button"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/apply"
+        app:layout_constraintTop_toBottomOf="@id/added_price_textview"
+        app:layout_constraintLeft_toRightOf="@id/won_textview"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/add_price_exittext"
+        app:layout_constraintBottom_toBottomOf="@id/card_num_exittext"
+        />
+
+    <TextView
+        android:id="@+id/total_price_textview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:gravity="right"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/total_price_info_textview"
+        app:layout_constraintTop_toBottomOf="@id/apply_button"/>
+
+    <TextView
+        android:id="@+id/total_price_info_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="@string/total_price"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/total_price_textview"
+        app:layout_constraintTop_toBottomOf="@id/apply_button"/>
+
+    <Button
+        android:id="@+id/close_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/close"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

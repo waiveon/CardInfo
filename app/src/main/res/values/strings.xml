@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">카드 혜택 정보</string>
+    <string name="hana_card_info">&#160;: 30만</string>
+    <string name="woori_card_info">&#160;: 30만, 70만, 100만</string>
+    <string name="kb_card_info">&#160;: 30만</string>
+    <string name="hyundai_card_info">&#160;: 50만 이상</string>
+
+    <string name="wooricard">우리 카드</string>
+    <string name="wooricard_benefit">영화 결재 시 3천원 할인 (12,000원 이상)\n\n롯데 / 에버 / 서울 랜드 / 통도환타지 자유 이용권 50% 할인\n\n스벅 / 투썸 20% 할인\n\n아웃백 / TGIF 10% 할인</string>
+
+    <string name="hanacard">하나 카드</string>
+    <string name="hanacard_benefit">주유 SK 리터 당 50원 할인 (월 한도 5천원)\n\n아웃백 / 파리바게뜨 10% 할인 (월 한도 1만원)\n\n커피빈 / 스타벅스 10% 할인 (월 한도 5천원)\n\n메가박스 / 롯데시네마 / CGV 1만원 이하 2천원, 1만원 초과 4천원 할인 (월 2회)</string>
+
+    <string name="hyundaicard">현대 카드</string>
+    <string name="hyundaicard_benefit">스타벅스 / 커피빈 / 탐앤탐스 / 엔질리너스 / 투썸 건 당 500원 할인 (일 1회, 연 30회)\n\n메가박스 / CGV 1만원 이하 3천원, 1만원 초과 6천원 할인 (월 1회)\n\n롯데 / 신세계 프리미엄 아울렛 10% 할인 (월 1회, 연간 2회, 건당 1만원 한도)\n- 롯데 프리미엄아웃렛 : 파주점, 김해점, 이천점\n- 신세계 프리미엄아웃렛 : 여주점, 파주점, 부산점\n\n유니클로, ZARA, H&amp;M 10% 할인 (월 1회, 연간 2회, 건당 1만원 한도)\n\n무료주차 (일 1회, 연간 20회, 주말(공휴일 포함) 무료 주차에 한함)\n- https://www.hyundaicard.com/cpc/cr/M_CPCCR0201_02.html\n</string>
+
+    <string name="kbcard">국민 카드</string>
+    <string name="first_running_title">어플 최초 실행</string>
+    <string name="first_running_read_sms">어플 최초 실행으로 이번 달 카드 내역을 읽어 오고 있습니다.</string>
+    <string name="first_running_saving">어플 최초 실행으로 이번 달 카드 내역을 저장하고 있습니다.</string>
+
+    <string name="noti_permission">\'%1$s\'를 찾아 활성화 시켜 주세요.</string>
+    <string name="used_price_reach">\'%1$s\' 사용금액 도달</string>
+    <string name="use_next_card">다음 카드를 사용해 주세요.\n%1$s</string>
+
+    <string name="personal">개인용도의 앱입니다.</string>
+    <string name="apply">적용</string>
+    <string name="manual_input_price">(직접 입력한 금액)</string>
+    <string name="total_price">(총 사용한 금액)</string>
+    <string name="email">Email</string>
+    <string name="passwd">암호</string>
+    <string name="close">닫기</string>
+    <string name="login">로그인</string>
+    <string name="register">등록</string>
+    <string name="won">원</string>
+    <string name="add_price">추가금액</string>
+    <string name="added_price">이전에 추가한 금액</string>
+    <string name="setting">설정</string>
+    <string name="choice">선택</string>
+    <string name="sync_cloud">클라우드 동기화</string>
+    <string name="card_choice">카드 선택</string>
+    <string name="server_access">서버 접속</string>
+    <string name="input_card_and_price">카드 선택이 안되어 있거나 추가 금액이 입력되지 않았습니다.</string>
+    <string name="auto_login">자동 로그인</string>
+    <string name="will_sync">구름 모양을 클릭하면 서버와 동기화 합니다.</string>
+    <string name="login_success">로그인 되었습니다.</string>
+    <string name="login_success_n_will_sync">로그인 되었습니다. 구름 모양을 클릭하면 서버와 동기화 합니다.</string>
+    <string name="auto_login_success_n_will_sync">자동 로그인 되었습니다. 구름 모양을 클릭하면 서버와 동기화 합니다.</string>
+    <string name="login_success_n_auto_sync">로그인 되었습니다. 자동으로 서버와 동기화 합니다.</string>
+    <string name="no_use_history">이번 달 사용 내역이 없습니다.</string>
+    <string name="card_number">카드번호</string>
+    <string name="no_type_card_number">(구분없음)</string>
+    <string name="card_number_ellipsis">-xxxx-xxxx-xxxx</string>
+    <string name="manual_input">직접입력</string>
+    <string name="receipt_of_sales">매출전표</string>
+    <string name="need_background_proc">어플 종료 시 정상 동작을 위해 배터리 사용 허가가 필요 합니다.</string>
+</resources>
