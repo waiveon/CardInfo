@@ -2,6 +2,7 @@ package com.sweetsound.storeplan.db
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import com.sweetsound.cardinfo.constant.ConstCardType
 import com.sweetsound.cardinfo.data.CardUseHistory
 import com.sweetsound.logtofile.LogToFile
@@ -23,13 +24,15 @@ class DbUtil(val context: Context) {
         val COLUMN_CARD_TYPE = "card_type"
         val COLUMN_PRICE = "price"
         val COLUMN_CARD_NUMBER = "card_number" // 우리카드의 경우 카드 넘버로 가족카드를 구분 한다.
+        val COLUMN_PLACE = "place"
     }
 
-    val COLUMNS = arrayOf(COLUMN_DATE, COLUMN_CARD_TYPE, COLUMN_PRICE, COLUMN_CARD_NUMBER)
+    val COLUMNS = arrayOf(COLUMN_DATE, COLUMN_CARD_TYPE, COLUMN_PRICE, COLUMN_CARD_NUMBER, COLUMN_PLACE)
     val COLUMN_INDEX_DATE = 0
     val COLUMN_INDEX_CARD_TYPE = 1
     val COLUMN_INDEX_PROCE = 2
     val COLUMN_INDEX_CARD_NUMBER = 3
+    val COLUMN_INDEX_PLACE = 4
 
     val DEFAULT_ORDER_BY = "${COLUMN_CARD_TYPE} DESC, ${COLUMN_DATE} DESC"
 
@@ -57,10 +60,12 @@ class DbUtil(val context: Context) {
 
         if (cursor != null) {
             while (cursor.moveToNext() == true) {
+                Log.e("TAG", "LJS== cursor : '" + cursor.getString(COLUMN_INDEX_PLACE) + "'")
                 cardUseHistory = CardUseHistory(cursor.getString(COLUMN_INDEX_CARD_NUMBER),
                     ConstCardType.getCardType(cursor.getInt(COLUMN_INDEX_CARD_TYPE)),
                     cursor.getLong(COLUMN_INDEX_PROCE),
-                    cursor.getLong(COLUMN_INDEX_DATE))
+                    cursor.getLong(COLUMN_INDEX_DATE),
+                    cursor.getString(COLUMN_INDEX_PLACE))
 
                 if (cardUseHistoryMap.containsKey(cardUseHistory.cardType) == true) {
                     cardUseHistorys = cardUseHistoryMap.get(cardUseHistory.cardType)!!

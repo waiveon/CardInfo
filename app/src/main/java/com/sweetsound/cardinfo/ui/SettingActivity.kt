@@ -71,7 +71,7 @@ class SettingActivity() : AppCompatActivity() {
                     }
 
                     addPrice = added_price_textview.text.toString().replace(",", "").toLong() + add_price_exittext.text.toString().toLong()
-                    val cardUseHistory = CardUseHistory(cardNum, ConstCardType.getCardType(mIntCardType), addPrice, ConstDate.MANUAL_INPUT)
+                    val cardUseHistory = CardUseHistory(cardNum, ConstCardType.getCardType(mIntCardType), addPrice, ConstDate.MANUAL_INPUT, getString(R.string.manual_input))
 
                     if (dbUtils.insert(cardUseHistory) == -1L) {
                         // update 해야 함

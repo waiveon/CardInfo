@@ -13,7 +13,8 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".ui.CardInfoActivity">
+        <activity android:name=".ui.CardInfoActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|smallestScreenSize|density">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -21,12 +22,15 @@
         </activity>
 
         <activity android:name=".ui.SettingActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|smallestScreenSize|density"
             android:windowSoftInputMode="adjustResize"/>
 
         <activity android:name=".ui.CardUseListActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|smallestScreenSize|density"
             android:windowSoftInputMode="adjustResize"/>
 
         <activity android:name=".ui.AlertDialogActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|smallestScreenSize|density"
             android:theme="@style/Theme.Transparent"/>
 
         <service android:name=".service.DetectedNotificationService"

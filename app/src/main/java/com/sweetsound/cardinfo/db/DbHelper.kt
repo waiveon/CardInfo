@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.sweetsound.storeplan.db.DbUtil.Companion.COLUMN_CARD_NUMBER
 import com.sweetsound.storeplan.db.DbUtil.Companion.COLUMN_CARD_TYPE
 import com.sweetsound.storeplan.db.DbUtil.Companion.COLUMN_DATE
+import com.sweetsound.storeplan.db.DbUtil.Companion.COLUMN_PLACE
 import com.sweetsound.storeplan.db.DbUtil.Companion.COLUMN_PRICE
 import com.sweetsound.storeplan.db.DbUtil.Companion.DB_VERSION
 
@@ -17,6 +18,7 @@ class DbHelper(context: Context,
             "${COLUMN_CARD_TYPE} INTEGER," +
             "${COLUMN_PRICE} INTEGER," +
             "${COLUMN_CARD_NUMBER} TEXT," +
+            "${COLUMN_PLACE} TEXT," +
             "PRIMARY KEY (${COLUMN_DATE}, ${COLUMN_CARD_TYPE})" +
             ")"
 

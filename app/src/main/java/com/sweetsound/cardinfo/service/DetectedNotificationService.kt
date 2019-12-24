@@ -3,10 +3,9 @@ package com.sweetsound.cardinfo.service
 import android.app.Notification
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import android.util.Log
 import com.sweetsound.cardinfo.constant.ConstCardType
-import com.sweetsound.cardinfo.constant.ConstDate
 import com.sweetsound.cardinfo.data.CardUseHistory
+import com.sweetsound.cardinfo.utils.CardUtils
 import com.sweetsound.logtofile.LogToFile
 import com.sweetsound.storeplan.db.DbUtil
 
@@ -47,13 +46,13 @@ class DetectedNotificationService(): NotificationListenerService() {
                     text?.let {
                         val texts = it.split(" ")
 
-                        var price = getPriceToLong(texts[4])
+                        var price = CardUtils.getPriceToLong(texts[4])
 
                         if (texts[3].equals("승인") == false) {
                             price = price * -1
                         }
 
-                        DbUtil(baseContext).insert(CardUseHistory("", ConstCardType.CARD_TYPE.HYUNDAI, price, parseDate(texts[6], texts[7])))
+                        DbUtil(baseContext).insert(CardUseHistory("", ConstCardType.CARD_TYPE.HYUNDAI, price, CardUtils.getDateToMillis(texts[6], texts[7]), texts[8]))
                     }
 
                 } else if (it.indexOf("승인") > -1) { // KB Card or BC 카드 : 승인 12,650원 - BC 카드 어플 에서 뿌리는 Noti라 동일하다.
@@ -76,7 +75,7 @@ class DetectedNotificationService(): NotificationListenerService() {
                         }
 
                         if (texts[6].lastIndexOf("9770") < 0) { // 통신료가 아니라면 저장한다.
-                            val cardUseHistory = CardUseHistory(cardNum, cardType, getPriceToLong(texts[2]), parseDate(texts[4], texts[5]))
+                            val cardUseHistory = CardUseHistory(cardNum, cardType, CardUtils.getPriceToLong(texts[2]), CardUtils.getDateToMillis(texts[4], texts[5]), texts[6])
                             DbUtil(baseContext).insert(cardUseHistory)
                         }
                     }
@@ -84,65 +83,17 @@ class DetectedNotificationService(): NotificationListenerService() {
                     val address = it.replace("-", "")
 
                     if (address.equals(ConstCardType.HYUNDAI_CARD_ADDRESS)) {
-                        Log.e("TAG", "LJS== 1111 : " + text)
-                        logToFile.wirte("Debugging", "Hyundai address " + address)
-                        logToFile.wirte("Debugging", "Hyundai text 1 " + text)
                             // text : [Web발신] \n 현대카드 블루멤버스 승인 \n 이*석 \n 120원 일시불 \n 12/10 13ㅣ35 \n 스마일페이 \n...
                         text?.let {
-                            Log.e("TAG", "LJS== 222 : " + text)
-                            Log.e("TAG", "LJS== 333 : " + it)
-                            logToFile.wirte("Debugging", "Hyundai text 2 " + text)
-                            logToFile.wirte("Debugging", "Hyundai text 3 " + it)
-                            DbUtil(baseContext).insert(getHyundaiCardUseHistory(text))
+                            CardUtils.saveHyundaiCardUseHistory(baseContext, it)
                         }
-
-                        Log.e("TAG", "LJS== 444 ==")
-                        logToFile.wirte("Debugging", "Hyundai text 444 ==")
                     } else if (address.equals(ConstCardType.WOORI_CARD_ADDRESS)) {
                         // text : [Web발신] \n 우리카드(7493)매출접수 \n 이*석님 \n 13,000원 \n 12월11일기준 \n 교통-지하철15건
                         // text : [Web발신] \n 우리카드(7493)승인 \n 이*석님 \n 13,000원 일시불 \n 12/15 20:40 \n 베라힐즈...
                         // text : [Web발신] \n [취소완료] \n 우리카드(7493) \n 이*석님 \n 13,000원 \n 12월18일 기준 \n 롯데몰...
 
                         text?.let {
-                            val texts = it.split("\n")
-                            texts[1] // 우리카드(7493)매출접수
-                            texts[3] // 13,000원
-
-                            val prices = texts[3].split(" ")
-                            val dates = texts[4].split(" ")
-
-                            // 카드를 직접 사용하지 않은 항목 중 통신요금은 제외 시킨다.
-                            if (texts[1].indexOf("매출접수") > -1 && texts[5].indexOf("통신요금") < 0) {
-                                val cardUseHistory = CardUseHistory(
-                                    getCardNum(texts[1]),
-                                    ConstCardType.CARD_TYPE.WOORI,
-                                    getPriceToLong(prices[0]),
-                                    ConstDate.RECEIPT_OF_SALES
-                                )
-
-                                DbUtil(baseContext).insert(cardUseHistory)
-                            } else if (texts[1].indexOf("취소") > -1) {
-                                val date = texts[5].substring(0, 5).replace("월", "/")
-                                val cardUseHistory = CardUseHistory(
-                                    getCardNum(texts[2]),
-                                    ConstCardType.CARD_TYPE.WOORI,
-                                    getPriceToLong(texts[4]) * -1,
-                                    parseDate(date, "00:00")
-                                )
-
-                                DbUtil(baseContext).insert(cardUseHistory)
-                            } else if (texts[1].indexOf("승인") > -1) {
-                                val cardUseHistory = CardUseHistory(
-                                    getCardNum(texts[1]),
-                                    ConstCardType.CARD_TYPE.WOORI,
-                                    getPriceToLong(prices[0]),
-                                    parseDate(dates[0], dates[1])
-                                )
-
-                                DbUtil(baseContext).insert(cardUseHistory)
-                            } else {
-
-                            }
+                            CardUtils.saveWooriCardUseHistory(baseContext, it)
                         }
                     } else if (address.equals(ConstCardType.KB_CARD_ADDRESS)) {
                         //
@@ -175,81 +126,41 @@ class DetectedNotificationService(): NotificationListenerService() {
 //        splitDate[1] // 12/07
 //        splitDate[2] // 12:53
 
-        val dateMillis = parseDate(splitDate[1], splitDate[2])
+        val dateMillis = CardUtils.getDateToMillis(splitDate[1], splitDate[2])
 
         var price = 0L
 
         if (splitTexts[2].indexOf("해외") > -1) {
             splitTexts[3] // USD 1.00
 
-            val usd = splitTexts[3].split(" ")[1].toBigDecimal().toDouble()
-            price = (usd * 1200).toLong()
+            val priceInfos = splitTexts[3].split(" ")
+
+            val usd = priceInfos[1].toBigDecimal().toDouble()
+
+            if (priceInfos[0].toLowerCase().equals("usd")) {
+                price = (usd * 1200).toLong()
+            } else {
+                price = usd.toLong()
+            }
 
             if (splitTexts[2].contains("승인") == false) {
                 price = price * -1
             }
         } else {
-            price = getPriceToLong(splitTexts[4])
+            price = CardUtils.getPriceToLong(splitTexts[4])
 
             if (splitTexts[3].contains("승인") == false) {
                 price = price * -1
             }
         }
 
-        return CardUseHistory("", ConstCardType.CARD_TYPE.HANA, price, dateMillis)
-    }
-
-    private fun getHyundaiCardUseHistory(text: String): CardUseHistory {
-        // text : [Web발신]\n" +
-        //                "현대카드 블루멤버스 승인\n" +
-        //                "이*석\n" +
-        //                "19,500원 일시불\n" +
-        //                "12/19 15:42\n" +
-        //                "브리꼴라쥬\n" +
-        //                "누적1,239,717원
-        val texts = text.split("\n")
-
-        texts[1] // 현대카드 블루멤버스 승인
-        var price = getPriceToLong(texts[3].split(" ")[0]) // 120원 일시불
-        Log.e("TAG", "LJS== 1 ==")
-
-        if (texts[1].lastIndexOf("승인") < 0) {
-            price = price * -1
-        }
-        Log.e("TAG", "LJS== 2 ==")
-
-        val dateSplit = texts[4].split(" ") // 12/10 13:35
-        Log.e("TAG", "LJS== 3 ==")
-        val dateMillis = parseDate(dateSplit[0], dateSplit[1])
-        Log.e("TAG", "LJS== 4 ==")
-        texts[5] // 스마일페이 - 사용한 장소
-        Log.e("TAG", "LJS== 5 ==")
-
-        return CardUseHistory("", ConstCardType.CARD_TYPE.HYUNDAI, price, dateMillis)
-    }
-
-    private fun parseDate(dateStr: String, timeStr: String): Long {
-        val date = dateStr.split("/")
-        val time = timeStr.split(":")
-
-        val calendar = java.util.Calendar.getInstance()
-        calendar.set(java.util.Calendar.MONTH, date[0].toInt() -1)
-        calendar.set(java.util.Calendar.DAY_OF_MONTH, date[1].toInt())
-        calendar.set(java.util.Calendar.HOUR_OF_DAY, time[0].toInt())
-        calendar.set(java.util.Calendar.MINUTE, time[1].toInt())
-        calendar.set(java.util.Calendar.SECOND, 0)
-        calendar.set(java.util.Calendar.MILLISECOND, 0)
-
-        return calendar.timeInMillis
+        return CardUseHistory("", ConstCardType.CARD_TYPE.HANA, price, dateMillis, splitTexts[5])
     }
 
     private fun getCardNum(text: String): String {
         val startIndex = text.indexOf("(")
         return text.substring(startIndex, startIndex + 6)
     }
-
-    private fun getPriceToLong(price: String): Long =
-        price.substring(0, price.length -1).replace(",", "").toLong()
 
     private fun isSkip(title: String?, packageName: String): Boolean {
         return isSkipPackage(packageName) == true ||

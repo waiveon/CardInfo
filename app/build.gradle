@@ -44,7 +44,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:19.2.0'
     implementation 'com.google.firebase:firebase-auth:19.2.0'
 
-    implementation name: 'permisstionManager', ext: 'aar'
+    implementation name: 'permissionManager', ext: 'aar'
     implementation name: 'LogToFile', ext: 'aar'
 
     testImplementation 'junit:junit:4.12'

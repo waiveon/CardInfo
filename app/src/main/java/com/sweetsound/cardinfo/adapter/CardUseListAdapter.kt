@@ -1,7 +1,6 @@
 package com.sweetsound.cardinfo.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sweetsound.cardinfo.R
@@ -13,8 +12,7 @@ import kotlinx.android.synthetic.main.activity_card_use_list_item.view.*
 class CardUseListAdapter(private val items: MutableList<CardUseHistory>) : RecyclerView.Adapter<CardUseListAdapter.ItemViewHolder> () {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.activity_card_use_list_item, parent, false)
-        return ItemViewHolder(itemView)
+        return ItemViewHolder(parent)
     }
 
     override fun getItemCount(): Int = items.size
@@ -27,19 +25,22 @@ class CardUseListAdapter(private val items: MutableList<CardUseHistory>) : Recyc
         }
     }
 
-    inner class ItemViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    inner class ItemViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+        LayoutInflater.from(parent.context).inflate(R.layout.activity_card_use_list_item, parent, false)) {
         fun bind(item: CardUseHistory) {
             var dateText: String = ""
 
             when (item.date) {
-                ConstDate.MANUAL_INPUT -> dateText = view.context.getString(R.string.manual_input)
+                ConstDate.MANUAL_INPUT -> dateText = itemView.context.getString(R.string.manual_input)
 
-                ConstDate.RECEIPT_OF_SALES -> dateText = view.context.getString(R.string.receipt_of_sales)
+                ConstDate.RECEIPT_OF_SALES -> dateText = itemView.context.getString(R.string.receipt_of_sales)
 
                 else -> dateText = Utils.millisToDate(item.date)
             }
-            view.date_textview.text = dateText
-            view.price_textview.text = "${Utils.getNumberWithComma(item.price)}원"
+
+            itemView.date_textview.text = dateText
+            itemView.price_textview.text = "${Utils.getNumberWithComma(item.price)}원"
+            itemView.place_textview.text = item.place
         }
     }
 }

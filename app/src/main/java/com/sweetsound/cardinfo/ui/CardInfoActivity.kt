@@ -35,6 +35,7 @@ import com.sweetsound.cardinfo.constant.ConstShardPreference.Companion.KEY_FIRST
 import com.sweetsound.cardinfo.constant.ConstShardPreference.Companion.KEY_PASSWD
 import com.sweetsound.cardinfo.constant.ConstShardPreference.Companion.SHARED_PREF_FIRST_RUNNING
 import com.sweetsound.cardinfo.data.CardUseHistory
+import com.sweetsound.cardinfo.utils.CardUtils
 import com.sweetsound.cardinfo.utils.Utils
 import com.sweetsound.logtofile.ui.LogDisplayActivity
 import com.sweetsound.permission.PermissionManager
@@ -63,16 +64,14 @@ class CardInfoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_card_info)
 
         if (isPermissionGrantred() == false) {
-            startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
-
             Toast.makeText(
                 baseContext,
                 getString(R.string.noti_permission, getString(R.string.app_name)),
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_LONG
             ).show()
-        }
 
-        PermissionManager.check(this, REQUEST_CODE_PERMISSION)
+            startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
+        }
 
         log_button.setOnClickListener {
             LogDisplayActivity.open(this@CardInfoActivity)
@@ -125,6 +124,8 @@ class CardInfoActivity : AppCompatActivity() {
                 dialog.show()
             }
         }
+
+        PermissionManager.check(this, REQUEST_CODE_PERMISSION)
     }
 
     override fun onStart() {
@@ -195,13 +196,10 @@ class CardInfoActivity : AppCompatActivity() {
 
                                 while (it.moveToNext()) {
                                     val address = it.getString(SMS_COLUMN_INDEX_ADDRESS)
-                                    var cardUseHistory = CardUseHistory(
-                                        ConstCardType.getCardType(address),
-                                        it.getString(SMS_COLUMN_INDEX_DATE).toLong()
-                                    )
+                                    var cardType = ConstCardType.getCardType(address)
 
-                                    if (cardUseHistory.cardType > ConstCardType.CARD_TYPE.UNKNOWN) {
-                                        cardUseHistory.parseSms(it.getString(SMS_COLUMN_INDEX_BODY))
+                                    if (cardType > ConstCardType.CARD_TYPE.UNKNOWN) {
+                                        val cardUseHistory = CardUtils.parsingSms(baseContext, cardType, it.getString(SMS_COLUMN_INDEX_BODY))
 
                                         // 저장 하지 말아야 할 것(통신료 등..)은 가격을 0으로 처리 된다.
                                         if (cardUseHistory.price > 0) {
@@ -214,8 +212,6 @@ class CardInfoActivity : AppCompatActivity() {
                                                 val cardUseHistorys = cardHashMap.get(address)
                                                 cardUseHistorys?.add(cardUseHistory)
                                             }
-
-                                            DbUtil(baseContext).insert(cardUseHistory)
                                         }
                                     }
                                 }
@@ -448,7 +444,7 @@ class CardInfoActivity : AppCompatActivity() {
             // 서버에서 받오고
 
             // 내꺼를 서버로 보낼 떈 서버에서 내려온 데이터 제외(날짜 가격으로 체크) 하고 보내기
-            val cardUseHistory = CardUseHistory("(7493)", ConstCardType.CARD_TYPE.WOORI, 13000, 0)
+            val cardUseHistory = CardUseHistory("(7493)", ConstCardType.CARD_TYPE.WOORI, 13000, 0, "테스트장소")
             val databaseRef = FirebaseDatabase.getInstance().getReference()
             databaseRef.child(Utils.stringToHex(email)).child("").setValue(cardUseHistory)
 
