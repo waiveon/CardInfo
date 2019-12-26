@@ -109,10 +109,19 @@ class DbUtil(val context: Context) {
         return totalPrice
     }
 
-    fun selectTotalPriceByManual(intCardType: Int): Long {
+    fun selectTotalPriceByManual(intCardType: Int, cardNum: String): Long {
         var totalPrice = 0L
 
-        val cursor = db.query(TABLE_NAME, COLUMNS, "${COLUMN_CARD_TYPE} = ${intCardType} AND ${COLUMN_DATE} = 0", null, null, null, DEFAULT_ORDER_BY)
+        val cursor = db.query(TABLE_NAME, COLUMNS,
+            cardNum.let {
+                var where = "${COLUMN_CARD_TYPE} = ${intCardType} AND ${COLUMN_DATE} = 0"
+                if (it.isEmpty() == false) {
+                    where = "${COLUMN_CARD_NUMBER} = ${it} AND ${where}"
+                }
+
+                where
+            },
+            null, null, null, DEFAULT_ORDER_BY)
 
         if (cursor != null) {
             while (cursor.moveToNext() == true) {

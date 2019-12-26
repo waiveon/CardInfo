@@ -112,25 +112,28 @@ class SettingActivity() : AppCompatActivity() {
 
                     mIntCardType = ConstCardType.getIntValue(itemSplit[0])
 
-                    // 우리 카드이면서 카드 번호가 없을 때 카드 번호를 입력 할 수 있도록 처리 한다.
-                    if (mIntCardType == ConstCardType.CARD_TYPE.WOORI.value && itemSplit.size < 2) {
-                        editable(card_num_exittext, true)
-                    } else {
-                        editable(card_num_exittext, false)
-                    }
-
                     if (mIntCardType != ConstCardType.CARD_TYPE.UNKNOWN.value) {
-                        added_price_textview.text =
-                            Utils.getNumberWithComma(DbUtil(baseContext).selectTotalPriceByManual(mIntCardType))
+                        var cardNum: String = ""
+
+                        // 카드 번호가 있다면 표시하고 수정하지 못하도록 설정
                         if (itemSplit.size > 1) {
-                            card_num_exittext.setText(itemSplit[1].substring(1, itemSplit[1].length - 1))
+                            cardNum = itemSplit[1]
+
+                            editable(card_num_exittext, false)
+                            card_num_exittext.setText(cardNum.substring(1, cardNum.length - 1))
                         } else {
+                            // 카드 번호가 없는데 우리카드면 카드 번호를 수정할 수 있도록 설정
                             if (mIntCardType == ConstCardType.CARD_TYPE.WOORI.value) {
+                                editable(card_num_exittext, true)
                                 card_num_exittext.setText("")
-                            } else {
+                            } else { // 카드 번호가 없는데 우리카드도 아니면 카드 번호를 수정 ㅎ
+                                editable(card_num_exittext, false)
                                 card_num_exittext.setText(getString(R.string.no_type_card_number))
                             }
                         }
+
+                        added_price_textview.text =
+                            Utils.getNumberWithComma(DbUtil(baseContext).selectTotalPriceByManual(mIntCardType, cardNum))
 
                         add_price_exittext.requestFocus()
                         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

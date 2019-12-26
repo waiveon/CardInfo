@@ -41,6 +41,7 @@ class CardUseListAdapter(private val items: MutableList<CardUseHistory>) : Recyc
             itemView.date_textview.text = dateText
             itemView.price_textview.text = "${Utils.getNumberWithComma(item.price)}원"
             itemView.place_textview.text = item.place
+            itemView.card_num_textview.text = item.cardNum
         }
     }
 }
