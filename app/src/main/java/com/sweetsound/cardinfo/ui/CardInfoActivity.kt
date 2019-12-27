@@ -1,6 +1,8 @@
 package com.sweetsound.cardinfo.ui
 
 import android.app.Activity
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -35,6 +37,7 @@ import com.sweetsound.cardinfo.constant.ConstShardPreference.Companion.KEY_FIRST
 import com.sweetsound.cardinfo.constant.ConstShardPreference.Companion.KEY_PASSWD
 import com.sweetsound.cardinfo.constant.ConstShardPreference.Companion.SHARED_PREF_FIRST_RUNNING
 import com.sweetsound.cardinfo.data.CardUseHistory
+import com.sweetsound.cardinfo.receiver.InitBroadcastReceiver
 import com.sweetsound.cardinfo.utils.CardUtils
 import com.sweetsound.cardinfo.utils.Utils
 import com.sweetsound.logtofile.ui.LogDisplayActivity
@@ -126,6 +129,8 @@ class CardInfoActivity : AppCompatActivity() {
         }
 
         PermissionManager.check(this, REQUEST_CODE_PERMISSION)
+
+        setInitAlarm()
     }
 
     override fun onStart() {
@@ -199,7 +204,11 @@ class CardInfoActivity : AppCompatActivity() {
                                     var cardType = ConstCardType.getCardType(address)
 
                                     if (cardType > ConstCardType.CARD_TYPE.UNKNOWN) {
-                                        val cardUseHistory = CardUtils.parsingSms(baseContext, cardType, it.getString(SMS_COLUMN_INDEX_BODY))
+                                        val cardUseHistory = CardUtils.parsingSms(
+                                            baseContext,
+                                            cardType,
+                                            it.getString(SMS_COLUMN_INDEX_BODY)
+                                        )
 
                                         // 저장 하지 말아야 할 것(통신료 등..)은 가격을 0으로 처리 된다.
                                         if (cardUseHistory.price > 0) {
@@ -450,5 +459,28 @@ class CardInfoActivity : AppCompatActivity() {
 
             Log.e("TAG", "LJS== 1 ==")
         }
+    }
+
+    private fun setInitAlarm() {
+        // 날짜 체크해서 매월 1일 0시로 알람을 설정
+        val initCalendar = Calendar.getInstance()
+        val currentMonth = initCalendar.get(Calendar.MONTH)
+
+        if (currentMonth == Calendar.DECEMBER) {
+            initCalendar.set(Calendar.MONTH, Calendar.JANUARY)
+        } else {
+            initCalendar.set(Calendar.MONTH, (currentMonth + 1))
+        }
+
+        initCalendar.set(Calendar.DAY_OF_MONTH, 1)
+        initCalendar.set(Calendar.HOUR, 0)
+        initCalendar.set(Calendar.MINUTE, 0)
+        initCalendar.set(Calendar.SECOND, 0)
+        initCalendar.set(Calendar.MILLISECOND, 0)
+
+
+        val initPendingIntent = PendingIntent.getBroadcast(this, 0, Intent(InitBroadcastReceiver.ACTION_INIT), PendingIntent.FLAG_UPDATE_CURRENT)
+        val initAlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        initAlarmManager.set(AlarmManager.RTC_WAKEUP, initCalendar.timeInMillis, initPendingIntent)
     }
 }

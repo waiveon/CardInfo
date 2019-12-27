@@ -170,7 +170,7 @@ class DbUtil(val context: Context) {
         return delete("${COLUMN_CARD_TYPE} = ${intCardType} AND ${COLUMN_DATE} = 0")
     }
 
-    fun delete(where: String): Int {
+    fun delete(where: String?): Int {
         return db.delete(TABLE_NAME, where, null)
     }
 }
