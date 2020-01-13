@@ -13,6 +13,7 @@ class InitDbService(): Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         DbUtil(baseContext).delete(null)
 
+        stopSelf()
         return super.onStartCommand(intent, flags, startId)
     }
 }

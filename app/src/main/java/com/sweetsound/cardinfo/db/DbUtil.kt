@@ -2,7 +2,6 @@ package com.sweetsound.storeplan.db
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import android.util.Log
 import com.sweetsound.cardinfo.constant.ConstCardType
 import com.sweetsound.cardinfo.data.CardUseHistory
 import com.sweetsound.logtofile.LogToFile
@@ -60,7 +59,6 @@ class DbUtil(val context: Context) {
 
         if (cursor != null) {
             while (cursor.moveToNext() == true) {
-                Log.e("TAG", "LJS== cursor : '" + cursor.getString(COLUMN_INDEX_PLACE) + "'")
                 cardUseHistory = CardUseHistory(cursor.getString(COLUMN_INDEX_CARD_NUMBER),
                     ConstCardType.getCardType(cursor.getInt(COLUMN_INDEX_CARD_TYPE)),
                     cursor.getLong(COLUMN_INDEX_PROCE),

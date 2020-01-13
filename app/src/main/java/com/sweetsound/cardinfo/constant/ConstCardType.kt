@@ -53,6 +53,8 @@ class ConstCardType {
             }
         }
 
+        fun getCardName(cardType: CARD_TYPE) = getCardName(cardType.value)
+
         fun getIntValue(cardType: CARD_TYPE): Int =
             cardType.value
 

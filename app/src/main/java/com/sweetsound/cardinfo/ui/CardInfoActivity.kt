@@ -1,6 +1,5 @@
 package com.sweetsound.cardinfo.ui
 
-import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -28,14 +27,13 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.sweetsound.cardinfo.R
+import com.sweetsound.cardinfo.application.CardInfoApplication.Companion.SHARED_PREF
 import com.sweetsound.cardinfo.constant.ConstCardType
-import com.sweetsound.cardinfo.constant.ConstShardPreference
-import com.sweetsound.cardinfo.constant.ConstShardPreference.Companion.KEY_EMAIL
-import com.sweetsound.cardinfo.constant.ConstShardPreference.Companion.KEY_FIRST_RUNNING
-import com.sweetsound.cardinfo.constant.ConstShardPreference.Companion.KEY_PASSWD
-import com.sweetsound.cardinfo.constant.ConstShardPreference.Companion.SHARED_PREF_FIRST_RUNNING
 import com.sweetsound.cardinfo.data.CardUseHistory
 import com.sweetsound.cardinfo.receiver.InitBroadcastReceiver
 import com.sweetsound.cardinfo.utils.CardUtils
@@ -131,6 +129,8 @@ class CardInfoActivity : AppCompatActivity() {
         PermissionManager.check(this, REQUEST_CODE_PERMISSION)
 
         setInitAlarm()
+
+//        CardUtils.parsingNoti(baseContext, "승인 245,000원", "우리BC(8842)승인 이*석님 245,000원 일시불 01/05 13:48 (주) 나무다움", "")
     }
 
     override fun onStart() {
@@ -153,10 +153,8 @@ class CardInfoActivity : AppCompatActivity() {
 
         when (requestCode) {
             REQUEST_CODE_PERMISSION -> {
-                val sharedPreferenceFirstRunning =
-                    getSharedPreferences(SHARED_PREF_FIRST_RUNNING, Activity.MODE_PRIVATE)
-
-                if (sharedPreferenceFirstRunning.getBoolean(KEY_FIRST_RUNNING, true) == true) {
+                if (SHARED_PREF.firstRunning == true) {
+//                if (sharedPreferenceFirstRunning.getBoolean(KEY_FIRST_RUNNING, true) == true) {
                     // 첫 어플 실행 시 SMS에서 카드내역을 가져 온다.
                     CoroutineScope(Dispatchers.Main).launch {
                         val alertDialog = AlertDialog.Builder(this@CardInfoActivity).create()
@@ -243,7 +241,7 @@ class CardInfoActivity : AppCompatActivity() {
 
                         alertDialog.dismiss()
 
-                        sharedPreferenceFirstRunning.edit().putBoolean(KEY_FIRST_RUNNING, false).commit()
+                        SHARED_PREF.firstRunning = false
 
                         sumPrice()
                     }
@@ -267,7 +265,6 @@ class CardInfoActivity : AppCompatActivity() {
             }
 
             R.id.cloud -> {
-                Log.e("TAG", "LJS== mFirebaseAuth.currentUser : " + mFirebaseAuth.currentUser?.email)
                 // 로그인이 되어 있는지 체크 후 동작 필요
                 mFirebaseAuth.currentUser?.let {
                     // 서버와 동기화 시키자
@@ -277,72 +274,17 @@ class CardInfoActivity : AppCompatActivity() {
                         override fun onComplete(task: Task<AuthResult>) {
                             if (task.isSuccessful == true) {
                                 // 자동 로그인이 되었으면 서버랑 동기화 시키자
+                            } else {
+                                Toast.makeText(baseContext, R.string.login_fail, Toast.LENGTH_SHORT).show()
+
+                                initAutoLoginInfo()
+                                showLonginDialog()
                             }
                         }
                     }).also {
                         if (it == false) {
                             // 자동 로그인이 아니면 로그인 하라는 팝업을 띄운다.
-                            val alertDialog = AlertDialog.Builder(this@CardInfoActivity)
-                            val contentsView = layoutInflater.inflate(R.layout.login_layout, null)
-
-                            alertDialog.setTitle(R.string.server_access)
-                            alertDialog.setView(contentsView)
-                            alertDialog.setPositiveButton(R.string.login, object : DialogInterface.OnClickListener {
-                                override fun onClick(dialog: DialogInterface?, which: Int) {
-                                    // 로그인
-                                    with(contentsView) {
-                                        if (checkPasswd(passwd_edittext.text.toString()) == true) {
-                                            login(
-                                                email_edittext.text.toString(),
-                                                passwd_edittext.text.toString(),
-                                                object : OnCompleteListener<AuthResult> {
-                                                    override fun onComplete(task: Task<AuthResult>) {
-                                                        if (task.isSuccessful == true) {
-                                                            Toast.makeText(
-                                                                baseContext,
-                                                                R.string.login_success_n_will_sync,
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
-                                                        }
-                                                    }
-                                                })
-
-                                            saveAutoLoginInfo(contentsView)
-                                        }
-                                    }
-                                }
-                            })
-                            alertDialog.setNeutralButton(R.string.register, object : DialogInterface.OnClickListener {
-                                override fun onClick(dialog: DialogInterface?, which: Int) {
-                                    // 등록
-                                    with(contentsView) {
-                                        if (checkPasswd(passwd_edittext.text.toString()) == true) {
-                                            registration(
-                                                email_edittext.text.toString(),
-                                                passwd_edittext.text.toString()
-                                            )
-
-                                            saveAutoLoginInfo(contentsView)
-                                        }
-                                    }
-                                }
-                            })
-                            alertDialog.setNegativeButton(android.R.string.cancel, null)
-                            val dialog = alertDialog.create()
-                            dialog.setOnShowListener(object : DialogInterface.OnShowListener {
-                                override fun onShow(dialog: DialogInterface?) {
-                                    contentsView.post {
-                                        with(contentsView) {
-                                            email_edittext.requestFocus()
-
-                                            val imm =
-                                                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                                            imm.showSoftInput(email_edittext, InputMethodManager.SHOW_IMPLICIT)
-                                        }
-                                    }
-                                }
-                            })
-                            dialog.show()
+                            showLonginDialog()
                         }
                     }
                 }
@@ -421,25 +363,92 @@ class CardInfoActivity : AppCompatActivity() {
     }
 
     private fun saveAutoLoginInfo(rootView: View) {
-        val sharedPrefEdit =
-            getSharedPreferences(ConstShardPreference.SHARED_PREF_AUTO_LOGIN, Activity.MODE_PRIVATE).edit()
-
         if (rootView.auto_login_checkbox.isChecked == true) {
-            sharedPrefEdit.putString(ConstShardPreference.KEY_EMAIL, rootView.email_edittext.text.toString())
-            sharedPrefEdit.putString(ConstShardPreference.KEY_PASSWD, rootView.passwd_edittext.text.toString())
-            sharedPrefEdit.apply()
+            SHARED_PREF.AutoLogin().email = rootView.email_edittext.text.toString()
+            SHARED_PREF.AutoLogin().passwd = rootView.passwd_edittext.text.toString()
         } else {
-            sharedPrefEdit.clear()
+            SHARED_PREF.AutoLogin().clear()
         }
+    }
+
+    private fun initAutoLoginInfo() {
+        SHARED_PREF.AutoLogin().clear()
+    }
+
+    private fun showLonginDialog() {
+        val alertDialog = AlertDialog.Builder(this@CardInfoActivity)
+        val contentsView = layoutInflater.inflate(R.layout.login_layout, null)
+
+        alertDialog.setTitle(R.string.server_access)
+        alertDialog.setView(contentsView)
+        alertDialog.setPositiveButton(R.string.login, object : DialogInterface.OnClickListener {
+            override fun onClick(dialog: DialogInterface?, which: Int) {
+                // 로그인
+                with(contentsView) {
+                    if (checkPasswd(passwd_edittext.text.toString()) == true) {
+                        login(
+                            email_edittext.text.toString(),
+                            passwd_edittext.text.toString(),
+                            object : OnCompleteListener<AuthResult> {
+                                override fun onComplete(task: Task<AuthResult>) {
+                                    if (task.isSuccessful == true) {
+                                        Toast.makeText(
+                                            baseContext,
+                                            R.string.login_success_n_will_sync,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        Toast.makeText(baseContext, R.string.login_fail, Toast.LENGTH_SHORT).show()
+
+                                        initAutoLoginInfo()
+                                    }
+                                }
+                            })
+
+                        saveAutoLoginInfo(contentsView)
+                    }
+                }
+            }
+        })
+        alertDialog.setNeutralButton(R.string.register, object : DialogInterface.OnClickListener {
+            override fun onClick(dialog: DialogInterface?, which: Int) {
+                // 등록
+                with(contentsView) {
+                    if (checkPasswd(passwd_edittext.text.toString()) == true) {
+                        registration(
+                            email_edittext.text.toString(),
+                            passwd_edittext.text.toString()
+                        )
+
+                        saveAutoLoginInfo(contentsView)
+                    }
+                }
+            }
+        })
+        alertDialog.setNegativeButton(android.R.string.cancel, null)
+        val dialog = alertDialog.create()
+        dialog.setOnShowListener(object : DialogInterface.OnShowListener {
+            override fun onShow(dialog: DialogInterface?) {
+                contentsView.post {
+                    with(contentsView) {
+                        email_edittext.requestFocus()
+
+                        val imm =
+                            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.showSoftInput(email_edittext, InputMethodManager.SHOW_IMPLICIT)
+                    }
+                }
+            }
+        })
+        dialog.show()
     }
 
     private fun procAutoLogin(onCompleteListener: OnCompleteListener<AuthResult>): Boolean {
         var result = false
-        val sharedPref = getSharedPreferences(ConstShardPreference.SHARED_PREF_AUTO_LOGIN, Activity.MODE_PRIVATE)
-        val autoLoginEmail = sharedPref.getString(KEY_EMAIL, null)
+        val autoLoginEmail = SHARED_PREF.AutoLogin().email
 
         autoLoginEmail?.let {
-            val autoLoginPasswd = sharedPref.getString(KEY_PASSWD, "")
+            val autoLoginPasswd = SHARED_PREF.AutoLogin().passwd
             login(autoLoginEmail, autoLoginPasswd!!, onCompleteListener)
 
             result = true
@@ -450,14 +459,49 @@ class CardInfoActivity : AppCompatActivity() {
 
     private fun syncServer(email: String) {
         if (TextUtils.isEmpty(email) == false) {
+            val databaseRef = FirebaseDatabase.getInstance().getReference()
+            databaseRef.child(Utils.stringToHex(email)) // root 설정
+
             // 서버에서 받오고
+            databaseRef.addChildEventListener(object : ChildEventListener {
+                override fun onCancelled(databaseError: DatabaseError) {
+                }
+
+                override fun onChildMoved(dataSnapshot: DataSnapshot, s: String?) {
+                }
+
+                override fun onChildChanged(dataSnapshot: DataSnapshot, s: String?) {
+                }
+
+                override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
+                    // loading Dialog 필요
+                    Log.e("TAG", "LJS====================================")
+                    Log.e("TAG", "LJS== children : " + dataSnapshot.children)
+                    dataSnapshot.children.forEach {
+                        Log.e("TAG", "LJS== value : " + it.getValue())
+//                        val cardUseHistory = it.getValue(CardUseHistory::class.java) as CardUseHistory
+//                        Log.e("TAG", "LJS== cardUseHistory : " + cardUseHistory)
+                        it.children.forEach {
+                            Log.e("TAG", "LJS== value : " + it.getValue())
+                        }
+                    }
+                    Log.e("TAG", "LJS====================================")
+
+                    // 이메일 밑에 있는 것들이 리스트별로 한번씩 여러번 호출됨.
+                    // - email
+                    // |- 우리카드 <- dataSnapshot.key
+                    // |- 국민카드 <- dataSnapshot.key
+                }
+
+                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                }
+
+            })
 
             // 내꺼를 서버로 보낼 떈 서버에서 내려온 데이터 제외(날짜 가격으로 체크) 하고 보내기
-            val cardUseHistory = CardUseHistory("(7493)", ConstCardType.CARD_TYPE.WOORI, 13000, 0, "테스트장소")
-            val databaseRef = FirebaseDatabase.getInstance().getReference()
-            databaseRef.child(Utils.stringToHex(email)).child("").setValue(cardUseHistory)
+            val cardUseHistory = CardUseHistory("(7493)", ConstCardType.CARD_TYPE.KB, 13000, 0, "테스트장소")
 
-            Log.e("TAG", "LJS== 1 ==")
+            databaseRef.child(cardUseHistory.getKeyPath()).setValue(cardUseHistory.toMap())
         }
     }
 
